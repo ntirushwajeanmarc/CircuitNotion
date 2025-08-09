@@ -1,0 +1,44 @@
+# Compiled Object files
+*.o
+*.obj
+
+# Executables
+*.exe
+*.elf
+
+# Debug files
+*.dSYM/
+*.su
+
+# Arduino IDE
+*.hex
+*.bin
+
+# Build directories
+build/
+.build/
+
+# Editor files
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+
+# Backup files
+*_backup.*
+*_old.*
+*.bak

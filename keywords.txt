@@ -1,0 +1,76 @@
+#######################################
+# CircuitNotion Arduino Library Keywords
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+CircuitNotion	KEYWORD1
+CircuitNotionSensor	KEYWORD1
+SensorValue	KEYWORD1
+DeviceMapping	KEYWORD1
+ConnectionStatus	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+begin	KEYWORD2
+setWiFi	KEYWORD2
+connect	KEYWORD2
+disconnect	KEYWORD2
+loop	KEYWORD2
+isConnected	KEYWORD2
+isAuthenticated	KEYWORD2
+getStatus	KEYWORD2
+getStatusString	KEYWORD2
+
+mapDevice	KEYWORD2
+mapDigitalDevice	KEYWORD2
+mapAnalogDevice	KEYWORD2
+mapPWMDevice	KEYWORD2
+controlLocalDevice	KEYWORD2
+
+addSensor	KEYWORD2
+addTemperatureSensor	KEYWORD2
+addHumiditySensor	KEYWORD2
+addLightSensor	KEYWORD2
+addMotionSensor	KEYWORD2
+addCustomSensor	KEYWORD2
+enableSensor	KEYWORD2
+disableSensor	KEYWORD2
+removeAllSensors	KEYWORD2
+
+onDeviceControl	KEYWORD2
+onConnection	KEYWORD2
+onLog	KEYWORD2
+
+printDiagnostics	KEYWORD2
+printSensorStatus	KEYWORD2
+printDeviceMappings	KEYWORD2
+
+enableAutoReconnect	KEYWORD2
+sendCustomMessage	KEYWORD2
+getLibraryVersion	KEYWORD2
+
+setChangeThreshold	KEYWORD2
+enableChangeDetection	KEYWORD2
+setEnabled	KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
+DISCONNECTED	LITERAL1
+CONNECTING	LITERAL1
+CONNECTED	LITERAL1
+AUTHENTICATED	LITERAL1
+
+CIRCUITNOTION_VERSION	LITERAL1
+
+#######################################
+# Global Instance (KEYWORD1)
+#######################################
+
+CN	KEYWORD1
