@@ -7,16 +7,21 @@
 #include <functional>
 
 // Version information
-#define CIRCUITNOTION_VERSION "1.0.0"
+#define CIRCUITNOTION_VERSION "1.1.0"
 #define CIRCUITNOTION_VERSION_MAJOR 1
-#define CIRCUITNOTION_VERSION_MINOR 0
+#define CIRCUITNOTION_VERSION_MINOR 1
 #define CIRCUITNOTION_VERSION_PATCH 0
+
+// Default Gate server (user can override in begin())
+#define CIRCUITNOTION_DEFAULT_HOST "iot.circuitnotion.com"
+#define CIRCUITNOTION_DEFAULT_PORT 443
+#define CIRCUITNOTION_DEFAULT_PATH "/api/ws"
 
 // Forward declarations
 class CircuitNotionSensor;
 
-// Callback function types
-typedef std::function<void(String deviceSerial, String state)> DeviceControlCallback;
+// Callback: device_serial, state, and optional data (angle, volume, muted from server)
+typedef std::function<void(String deviceSerial, String state, JsonObject data)> DeviceControlCallback;
 typedef std::function<void(String message)> LogCallback;
 typedef std::function<void(bool connected)> ConnectionCallback;
 
@@ -131,8 +136,9 @@ private:
     void sendPong();
     void sendSensorReading(CircuitNotionSensor *sensor, SensorValue value);
     void log(String message);
-    void handleDeviceStateUpdate(String deviceSerial, String state);
+    void handleDeviceStateUpdate(String deviceSerial, String state, JsonObject data);
     DeviceMapping *findDeviceMapping(String serial);
+    bool sendNotificationRequest(String templateName, JsonObject variables);
     void attemptReconnect();
     static CircuitNotion *_instance; // For static callback
 
@@ -141,7 +147,10 @@ public:
     ~CircuitNotion();
 
     // Configuration methods
+    // Full: begin(host, port, path, apiKey, microcontrollerName, useSSL)
     void begin(String host, int port, String path, String apiKey, String microcontrollerName, bool useSSL = true);
+    // Minimal: begin(apiKey, microcontrollerName) — uses default host/path/port
+    void begin(String apiKey, String microcontrollerName);
     void setWiFi(String ssid, String password);
 
     // Callback setters
@@ -156,6 +165,10 @@ public:
     void mapPWMDevice(String deviceSerial, uint8_t pin, String deviceName = "");
     void controlLocalDevice(String deviceSerial, String state);
     void controlLocalDevice(String deviceSerial, int value);
+
+    // Email notification (uses stored host + apiKey). Only pass template and variables.
+    bool sendNotification(String templateName, JsonObject variables);
+    bool sendNotification(String templateName);  // optional empty variables
 
     // Sensor management (sensors are attached to this microcontroller)
     CircuitNotionSensor *addSensor(String type, String deviceSerial, String location,

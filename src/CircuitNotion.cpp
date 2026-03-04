@@ -1,5 +1,13 @@
 #include "CircuitNotion.h"
 
+#if defined(ESP8266)
+#include <ESP8266HTTPClient.h>
+#include <WiFiClientSecure.h>
+#elif defined(ESP32)
+#include <HTTPClient.h>
+#include <WiFiClientSecure.h>
+#endif
+
 // Global instance
 CircuitNotion CN;
 
@@ -82,6 +90,11 @@ void CircuitNotion::begin(String host, int port, String path, String apiKey, Str
     log("CircuitNotion library initialized v" + String(CIRCUITNOTION_VERSION));
     log("Host: " + _host + ":" + String(_port));
     log("Microcontroller: " + _microcontrollerName);
+}
+
+void CircuitNotion::begin(String apiKey, String microcontrollerName) {
+    begin(String(CIRCUITNOTION_DEFAULT_HOST), CIRCUITNOTION_DEFAULT_PORT,
+          String(CIRCUITNOTION_DEFAULT_PATH), apiKey, microcontrollerName, true);
 }
 
 void CircuitNotion::setWiFi(String ssid, String password) {
@@ -444,8 +457,9 @@ void CircuitNotion::handleMessage(const char* msg) {
     else if (type == "device_control") {
         String deviceSerial = doc["device_serial"];
         String state = doc["state"];
+        JsonObject data = doc["data"].as<JsonObject>();
         
-        handleDeviceStateUpdate(deviceSerial, state);
+        handleDeviceStateUpdate(deviceSerial, state, data);
     }
     else if (type == "ping") {
         sendPong();
@@ -458,13 +472,18 @@ void CircuitNotion::handleMessage(const char* msg) {
     }
 }
 
-void CircuitNotion::handleDeviceStateUpdate(String deviceSerial, String state) {
-    // Control local device if mapped
-    controlLocalDevice(deviceSerial, state);
+void CircuitNotion::handleDeviceStateUpdate(String deviceSerial, String state, JsonObject data) {
+    // Control local device if mapped (use angle for servo when present)
+    if (!data.isNull() && data.containsKey("angle")) {
+        int angle = data["angle"].as<int>();
+        controlLocalDevice(deviceSerial, angle);
+    } else {
+        controlLocalDevice(deviceSerial, state);
+    }
     
-    // Call user callback
+    // Call user callback (data may contain angle, volume, muted, etc.)
     if (_deviceControlCallback) {
-        _deviceControlCallback(deviceSerial, state);
+        _deviceControlCallback(deviceSerial, state, data);
     }
     
     log("Device control: " + deviceSerial + " -> " + state);
@@ -512,4 +531,62 @@ void CircuitNotion::log(String message) {
     } else {
         Serial.println("[CircuitNotion] " + message);
     }
+}
+
+bool CircuitNotion::sendNotification(String templateName) {
+    JsonDocument emptyDoc;
+    JsonObject emptyVars = emptyDoc.to<JsonObject>();
+    return sendNotification(templateName, emptyVars);
+}
+
+bool CircuitNotion::sendNotification(String templateName, JsonObject variables) {
+    return sendNotificationRequest(templateName, variables);
+}
+
+bool CircuitNotion::sendNotificationRequest(String templateName, JsonObject variables) {
+    JsonDocument doc;
+    doc["template"] = templateName;
+    JsonObject vars = doc["variables"].to<JsonObject>();
+    for (JsonPair kv : variables) {
+        vars[kv.key()] = kv.value();
+    }
+    String body;
+    serializeJson(doc, body);
+
+#if defined(ESP8266) || defined(ESP32)
+    int port = _port;
+    String url = String(_useSSL ? "https" : "http") + "://" + _host;
+    if ((_useSSL && port != 443) || (!_useSSL && port != 80)) {
+        url += ":" + String(port);
+    }
+    url += "/api/notify";
+    WiFiClientSecure client;
+    client.setInsecure();
+#if defined(ESP8266)
+    HTTPClient http;
+    if (!http.begin(client, url)) {
+        log("sendNotification: failed to begin HTTP");
+        return false;
+    }
+#else
+    HTTPClient http;
+    if (!http.begin(client, url)) {
+        log("sendNotification: failed to begin HTTP");
+        return false;
+    }
+#endif
+    http.addHeader("Content-Type", "application/json");
+    http.addHeader("X-API-Key", _apiKey);
+    int code = http.POST(body);
+    bool ok = (code == 200);
+    if (!ok) {
+        log("sendNotification: HTTP " + String(code));
+    }
+    http.end();
+    return ok;
+#else
+    (void)body;
+    log("sendNotification: not implemented for this platform");
+    return false;
+#endif
 }
