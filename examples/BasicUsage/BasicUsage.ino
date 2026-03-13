@@ -53,8 +53,8 @@ void setup()
     // Configure WiFi credentials
     CN.setWiFi(ssid, password);
 
-    // Configure CircuitNotion connection
-    CN.begin("iot.circuitnotion.com", 443, "/ws", api_key, microcontroller_name);
+    // Configure CircuitNotion connection (uses default host/port/path)
+    CN.begin(api_key, microcontroller_name);
 
     // Map dashboard device to local pin for automatic control
     // When you toggle this device in the dashboard, the LED will respond
