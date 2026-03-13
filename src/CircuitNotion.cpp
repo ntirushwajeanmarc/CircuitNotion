@@ -273,6 +273,8 @@ void CircuitNotion::connect() {
     
     if (_autoReconnect) {
         _webSocket.setReconnectInterval(_reconnectInterval);
+        // Keep connection alive so server/MC don't drop it (prevents "broken pipe" / "unexpected EOF")
+        _webSocket.enableHeartbeat(15000, 3000, 2);
     }
 }
 
