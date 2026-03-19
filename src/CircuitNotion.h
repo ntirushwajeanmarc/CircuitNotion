@@ -7,9 +7,9 @@
 #include <functional>
 
 // Version information
-#define CIRCUITNOTION_VERSION "1.1.0"
+#define CIRCUITNOTION_VERSION "1.2.0"
 #define CIRCUITNOTION_VERSION_MAJOR 1
-#define CIRCUITNOTION_VERSION_MINOR 1
+#define CIRCUITNOTION_VERSION_MINOR 2
 #define CIRCUITNOTION_VERSION_PATCH 0
 
 // Default Gate server (user can override in begin())
@@ -165,6 +165,7 @@ public:
     void mapPWMDevice(String deviceSerial, uint8_t pin, String deviceName = "");
     void controlLocalDevice(String deviceSerial, String state);
     void controlLocalDevice(String deviceSerial, int value);
+    bool reportPhysicalState(String deviceSerial, String state, String source = "physical_button");
 
     // Email notification (uses stored host + apiKey). Only pass template and variables.
     bool sendNotification(String templateName, JsonObject variables);

@@ -1,6 +1,6 @@
 # CircuitNotion (Arduino / ESP8266 / ESP32)
 
-Connect your ESP8266 or ESP32 to the **CircuitNotion Gate** server over WebSocket: receive device control (on/off, servo angle, volume, mute), send sensor readings, and trigger email notifications.
+Connect your ESP8266 or ESP32 to the **CircuitNotion Gate** server over WebSocket: receive device control (on/off, servo angle, volume, mute), send sensor readings, report physical button changes, and trigger email notifications.
 
 ## Requirements
 
@@ -47,6 +47,7 @@ void loop() {
 | `connect()` / `disconnect()` | Start/stop WebSocket. |
 | `loop()` | Call in `loop()`; handles ping, sensors, reconnect. |
 | `onDeviceControl(callback)` | Callback(deviceSerial, state, data). Use `data["angle"]`, `data["volume"]`, `data["muted"]`. |
+| `reportPhysicalState(deviceSerial, state, source)` | Report local physical on/off changes so server/dashboard state is updated immediately. |
 | `mapDevice(serial, pin, name, isDigital)` | Map device to GPIO (digital: relay/light; analog: PWM/servo value). |
 | `addSensor(type, deviceSerial, location, intervalMs, readCallback)` | Send sensor readings to Gate. |
 | `sendNotification(template, variables)` | POST to `/api/notify` (uses stored host + API key). Templates: `threshold_alert`, `device_alert`, `custom`. |
@@ -55,4 +56,4 @@ See the main [iot_library README](../README.md) and [Notify Email API](../../doc
 
 ## Version
 
-1.1.0 — Matches Python library: minimal begin, device_control with `data`, `sendNotification`.
+1.2.0 — Adds `reportPhysicalState(...)` for physical switch sync, plus previous minimal begin/device_control/sendNotification support.

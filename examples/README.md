@@ -68,6 +68,21 @@ Industrial IoT monitoring solution with:
 
 ---
 
+### 5. 🔘 PhysicalSwitch
+
+**File:** `PhysicalSwitch/PhysicalSwitch.ino`
+
+Physical pushbutton + relay synchronization example showing:
+
+- Local hardware button toggles relay state
+- `CN.reportPhysicalState(...)` sends physical changes to Gate
+- Dashboard/app state remains consistent with real hardware state
+- Remote `device_control` updates are still applied locally
+
+**Hardware:** ESP8266/ESP32, pushbutton, relay module (or LED for testing)
+
+---
+
 ## 🚀 Quick Start Guide
 
 ### 1. Choose Your Example
@@ -78,6 +93,7 @@ Select the example that best matches your project needs:
 - **Multiple sensors?** Use `SensorHub`
 - **Home automation?** Try `SmartHome`
 - **Industrial application?** Use `IndustrialMonitoring`
+- **Physical button sync?** Use `PhysicalSwitch`
 
 ### 2. Dashboard Setup
 

@@ -175,6 +175,32 @@ void CircuitNotion::controlLocalDevice(String deviceSerial, int value) {
     }
 }
 
+bool CircuitNotion::reportPhysicalState(String deviceSerial, String state, String source) {
+    if (_status != AUTHENTICATED) {
+        log("reportPhysicalState: not authenticated");
+        return false;
+    }
+
+    String normalized = state;
+    normalized.toLowerCase();
+    if (normalized != "on" && normalized != "off") {
+        log("reportPhysicalState: state must be 'on' or 'off'");
+        return false;
+    }
+
+    JsonDocument doc;
+    doc["type"] = "physical_state_changed";
+    doc["device_serial"] = deviceSerial;
+    doc["state"] = normalized;
+    doc["source"] = source;
+
+    String message;
+    serializeJson(doc, message);
+    _webSocket.sendTXT(message);
+    log("Reported physical state change: " + deviceSerial + " -> " + normalized);
+    return true;
+}
+
 DeviceMapping* CircuitNotion::findDeviceMapping(String serial) {
     for (auto& mapping : _deviceMappings) {
         if (mapping.serial == serial) {
